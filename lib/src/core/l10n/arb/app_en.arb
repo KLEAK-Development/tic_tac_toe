@@ -1,0 +1,132 @@
+{
+  "@@locale": "en",
+  "appTitle": "Tic Tac Toe",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "newGame": "New Game",
+  "@newGame": {
+    "description": "Button text to start a new game"
+  },
+  "twoPlayerGame": "Two Player Game",
+  "@twoPlayerGame": {
+    "description": "Title for two player game mode"
+  },
+  "playerX": "Player X",
+  "@playerX": {
+    "description": "Display name for player X"
+  },
+  "playerO": "Player O",
+  "@playerO": {
+    "description": "Display name for player O"
+  },
+  "playerTurn": "{player}'s Turn",
+  "@playerTurn": {
+    "description": "Indicates whose turn it is",
+    "placeholders": {
+      "player": {
+        "type": "String",
+        "example": "Player X"
+      }
+    }
+  },
+  "playerXWins": "Player X Wins!",
+  "@playerXWins": {
+    "description": "Message when player X wins"
+  },
+  "playerOWins": "Player O Wins!",
+  "@playerOWins": {
+    "description": "Message when player O wins"
+  },
+  "draw": "It's a Draw!",
+  "@draw": {
+    "description": "Message when the game ends in a draw"
+  },
+  "gameEndedDraw": "The game ended in a draw!",
+  "@gameEndedDraw": {
+    "description": "Dialog content for draw"
+  },
+  "playerWonGame": "{player} has won the game!",
+  "@playerWonGame": {
+    "description": "Dialog content when a player wins",
+    "placeholders": {
+      "player": {
+        "type": "String",
+        "example": "Player X"
+      }
+    }
+  },
+  "resetGame": "Reset Game",
+  "@resetGame": {
+    "description": "Button text to reset the game"
+  },
+  "playAgain": "Play Again",
+  "@playAgain": {
+    "description": "Button text to play again after game over"
+  },
+  "language": "Language",
+  "@language": {
+    "description": "Label for language selector"
+  },
+  "languageEnglish": "English",
+  "@languageEnglish": {
+    "description": "English language option"
+  },
+  "languageFrench": "Français",
+  "@languageFrench": {
+    "description": "French language option"
+  },
+  "languageSpanish": "Español",
+  "@languageSpanish": {
+    "description": "Spanish language option"
+  },
+  "languageGerman": "Deutsch",
+  "@languageGerman": {
+    "description": "German language option"
+  },
+  "languageSystemDefault": "System Default",
+  "@languageSystemDefault": {
+    "description": "System default language option"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Label for theme selector"
+  },
+  "themeSystemDefault": "System Default",
+  "@themeSystemDefault": {
+    "description": "System default theme option"
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Light theme option"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Dark theme option"
+  },
+  "semanticCellEmpty": "Cell {cellNumber}, empty",
+  "@semanticCellEmpty": {
+    "description": "Semantic label for empty game cell",
+    "placeholders": {
+      "cellNumber": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticCellFilled": "Cell {cellNumber}, filled with {symbol}",
+  "@semanticCellFilled": {
+    "description": "Semantic label for filled game cell",
+    "placeholders": {
+      "cellNumber": {
+        "type": "String"
+      },
+      "symbol": {
+        "type": "String"
+      }
+    }
+  },
+  "semanticGameStatus": "Game status",
+  "@semanticGameStatus": {
+    "description": "Semantic label for game status indicator"
+  }
+}
