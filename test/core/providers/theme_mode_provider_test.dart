@@ -1,68 +1,91 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tic_tac_toe/src/core/providers/theme_mode_provider.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.dart';
+import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
+import 'package:tic_tac_toe/src/features/theme_settings/provider/theme_mode_provider.dart';
 
 void main() {
   group('AppThemeMode Provider -', () {
+    ProviderContainer makeContainer() {
+      final db = AppDatabase.forTesting(NativeDatabase.memory());
+      addTearDown(db.close);
+      return ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(db)],
+      );
+    }
+
     test('initial state is ThemeMode.system', () {
-      final container = ProviderContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
-      final themeMode = container.read(appThemeModeProvider);
+      final themeMode = container.read(effectiveThemeModeProvider);
 
       expect(themeMode, equals(ThemeMode.system));
     });
 
     test('setThemeMode updates state to light mode', () {
-      final container = ProviderContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container
           .read(appThemeModeProvider.notifier)
           .setThemeMode(ThemeMode.light);
 
-      final themeMode = container.read(appThemeModeProvider);
+      final themeMode = container.read(effectiveThemeModeProvider);
 
       expect(themeMode, equals(ThemeMode.light));
     });
 
     test('setThemeMode updates state to dark mode', () {
-      final container = ProviderContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       container
           .read(appThemeModeProvider.notifier)
           .setThemeMode(ThemeMode.dark);
 
-      final themeMode = container.read(appThemeModeProvider);
+      final themeMode = container.read(effectiveThemeModeProvider);
 
       expect(themeMode, equals(ThemeMode.dark));
     });
 
     test('setThemeMode can switch between modes multiple times', () {
-      final container = ProviderContainer();
+      final container = makeContainer();
       addTearDown(container.dispose);
 
       final notifier = container.read(appThemeModeProvider.notifier);
 
       notifier.setThemeMode(ThemeMode.light);
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.light));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.light),
+      );
 
       notifier.setThemeMode(ThemeMode.dark);
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.dark));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.dark),
+      );
 
       notifier.setThemeMode(ThemeMode.system);
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.system));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.system),
+      );
     });
 
     group('Widget Integration -', () {
       testWidgets('MaterialApp respects theme mode changes', (tester) async {
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
+        addTearDown(db.close);
         await tester.pumpWidget(
           ProviderScope(
+            overrides: [appDatabaseProvider.overrideWithValue(db)],
             child: Consumer(
               builder: (context, ref, _) {
-                final themeMode = ref.watch(appThemeModeProvider);
+                final themeMode = ref.watch(effectiveThemeModeProvider);
 
                 return MaterialApp(
                   themeMode: themeMode,
@@ -99,11 +122,14 @@ void main() {
       });
 
       testWidgets('theme mode persists across rebuilds', (tester) async {
+        final db = AppDatabase.forTesting(NativeDatabase.memory());
+        addTearDown(db.close);
         await tester.pumpWidget(
           ProviderScope(
+            overrides: [appDatabaseProvider.overrideWithValue(db)],
             child: Consumer(
               builder: (context, ref, _) {
-                final themeMode = ref.watch(appThemeModeProvider);
+                final themeMode = ref.watch(effectiveThemeModeProvider);
 
                 return MaterialApp(
                   themeMode: themeMode,

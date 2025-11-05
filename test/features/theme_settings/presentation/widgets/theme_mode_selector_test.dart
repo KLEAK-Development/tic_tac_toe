@@ -1,15 +1,30 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.dart';
 import 'package:tic_tac_toe/src/core/l10n/app_localizations.dart';
-import 'package:tic_tac_toe/src/core/providers/theme_mode_provider.dart';
+import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
 import 'package:tic_tac_toe/src/features/theme_settings/presentation/widgets/theme_mode_selector.dart';
+import 'package:tic_tac_toe/src/features/theme_settings/provider/theme_mode_provider.dart';
 
 void main() {
   group('ThemeModeSelector', () {
+    late AppDatabase database;
+
+    setUp(() {
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
     Widget buildTestWidget({ThemeMode? initialThemeMode}) {
       return ProviderScope(
         overrides: [
+          // Use in-memory DB to avoid path_provider and drift warnings
+          appDatabaseProvider.overrideWithValue(database),
           // Override the provider to start with a specific theme mode
           if (initialThemeMode != null)
             appThemeModeProvider.overrideWith(
@@ -60,6 +75,9 @@ void main() {
         buildTestWidget(initialThemeMode: ThemeMode.light),
       );
 
+      // Allow async provider to resolve
+      await tester.pump();
+
       // Open theme menu
       await tester.tap(find.byKey(const Key('menu_theme_button')));
       await tester.pumpAndSettle();
@@ -90,6 +108,9 @@ void main() {
         buildTestWidget(initialThemeMode: ThemeMode.dark),
       );
 
+      // Allow async provider to resolve
+      await tester.pump();
+
       // Open theme menu
       await tester.tap(find.byKey(const Key('menu_theme_button')));
       await tester.pumpAndSettle();
@@ -114,7 +135,9 @@ void main() {
     });
 
     testWidgets('can switch from System Default to Light', (tester) async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
@@ -134,7 +157,10 @@ void main() {
       );
 
       // Initially should be system (default)
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.system));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.system),
+      );
 
       // Open theme menu
       await tester.tap(find.byKey(const Key('menu_theme_button')));
@@ -145,12 +171,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify theme mode changed to Light
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.light));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.light),
+      );
     });
 
     testWidgets('can switch from Light to Dark', (tester) async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(database),
           appThemeModeProvider.overrideWith(
             () => TestAppThemeMode(ThemeMode.light),
           ),
@@ -175,7 +205,10 @@ void main() {
       );
 
       // Initially should be Light
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.light));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.light),
+      );
 
       // Open theme menu
       await tester.tap(find.byKey(const Key('menu_theme_button')));
@@ -186,12 +219,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify theme mode changed to Dark
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.dark));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.dark),
+      );
     });
 
     testWidgets('can switch from Dark back to System Default', (tester) async {
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(database),
           appThemeModeProvider.overrideWith(
             () => TestAppThemeMode(ThemeMode.dark),
           ),
@@ -216,7 +253,10 @@ void main() {
       );
 
       // Initially should be Dark
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.dark));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.dark),
+      );
 
       // Open theme menu
       await tester.tap(find.byKey(const Key('menu_theme_button')));
@@ -227,11 +267,16 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify theme mode changed to System
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.system));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.system),
+      );
     });
 
     testWidgets('can switch between all theme modes', (tester) async {
-      final container = ProviderContainer();
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
       addTearDown(container.dispose);
 
       await tester.pumpWidget(
@@ -255,21 +300,30 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_theme_light')));
       await tester.pumpAndSettle();
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.light));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.light),
+      );
 
       // Switch to Dark
       await tester.tap(find.byKey(const Key('menu_theme_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_theme_dark')));
       await tester.pumpAndSettle();
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.dark));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.dark),
+      );
 
       // Switch back to System
       await tester.tap(find.byKey(const Key('menu_theme_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_theme_system')));
       await tester.pumpAndSettle();
-      expect(container.read(appThemeModeProvider), equals(ThemeMode.system));
+      expect(
+        container.read(effectiveThemeModeProvider),
+        equals(ThemeMode.system),
+      );
     });
   });
 }
@@ -281,7 +335,7 @@ class TestAppThemeMode extends AppThemeMode {
   final ThemeMode initialThemeMode;
 
   @override
-  ThemeMode build() {
+  Future<ThemeMode> build() async {
     return initialThemeMode;
   }
 }
