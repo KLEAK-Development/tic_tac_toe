@@ -10,7 +10,7 @@ import 'robots/theme_mode_robot.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('Theme Mode Persistence - Light, Dark, and System modes', (
+  testWidgets('Theme Mode - Light, Dark, and System modes', (
     WidgetTester tester,
   ) async {
     // Start the app
