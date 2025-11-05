@@ -361,30 +361,82 @@ The locale system uses a **separation of concerns** approach with **database per
 - Locale preference persists across app restarts via Drift database
 
 - **appThemeModeProvider**: Controls the app's theme mode
-  - Returns `ThemeMode` (system, light, or dark)
-  - Default: `ThemeMode.system` (follows device theme settings)
+  - Returns `AsyncValue<ThemeMode>` (system, light, or dark)
   - Provides `setThemeMode(ThemeMode)` method to change theme at runtime
-  - Used by the `App` widget to configure `MaterialApp.router`
+  - Persists theme mode preference to database using Drift
   - Accessible via theme selector in menu screen AppBar
+  - Located in `lib/src/features/theme_settings/provider/theme_mode_provider.dart`
 
 Example:
 ```dart
 @riverpod
 class AppThemeMode extends _$AppThemeMode {
   @override
-  ThemeMode build() {
-    return ThemeMode.system;  // Follow system theme by default
+  Future<ThemeMode> build() async {
+    // Load saved theme mode from database
+    final repository = ref.read(themeModeRepositoryProvider);
+    return await repository.getThemeMode();
   }
 
-  void setThemeMode(ThemeMode mode) {
-    state = mode;
+  Future<void> setThemeMode(ThemeMode mode) async {
+    // Update state immediately (fire-and-forget pattern)
+    state = AsyncValue.data(mode);
+
+    // Save to database asynchronously
+    final repository = ref.read(themeModeRepositoryProvider);
+    repository.saveThemeMode(mode);
   }
 }
 
-// Usage in UI:
-final currentThemeMode = ref.watch(appThemeModeProvider);
-ref.read(appThemeModeProvider.notifier).setThemeMode(ThemeMode.dark);
+// Usage in UI (must handle AsyncValue):
+final asyncThemeMode = ref.watch(appThemeModeProvider);
+final currentThemeMode = asyncThemeMode.when(
+  data: (mode) => mode,
+  loading: () => ThemeMode.system,
+  error: (_, __) => ThemeMode.system,
+);
+
+// Calling setThemeMode:
+await ref.read(appThemeModeProvider.notifier).setThemeMode(ThemeMode.dark);
 ```
+
+- **effectiveThemeModeProvider**: Derived provider that computes the effective theme mode
+  - Returns `ThemeMode` (always a concrete theme mode, never async)
+  - Watches `appThemeModeProvider` and handles loading/error states
+  - Used by the `App` widget to configure `MaterialApp.router`
+  - Maps loading and error states to `ThemeMode.system` for graceful fallback
+  - This ensures MaterialApp always receives a concrete ThemeMode object
+
+Example:
+```dart
+@riverpod
+ThemeMode effectiveThemeMode(Ref ref) {
+  final asyncMode = ref.watch(appThemeModeProvider);
+  return asyncMode.when(
+    data: (mode) => mode,
+    loading: () => ThemeMode.system,
+    error: (_, __) => ThemeMode.system,
+  );
+}
+
+// Usage in App widget:
+final themeMode = ref.watch(effectiveThemeModeProvider);
+return MaterialApp.router(
+  themeMode: themeMode,
+  // ...
+);
+```
+
+**Theme Mode Management Pattern:**
+
+The theme mode system uses a **separation of concerns** approach with **database persistence**:
+- `appThemeModeProvider` stores the user's preference (async) and persists to database
+- `themeModeRepository` handles database CRUD operations for theme mode preferences
+- `effectiveThemeModeProvider` computes the actual theme mode to use (always concrete)
+- Theme mode is stored as nullable string in database: 'light', 'dark', or NULL (for system)
+- NULL in database maps to `ThemeMode.system` (follows device theme settings)
+- MaterialApp always receives a concrete ThemeMode, ensuring proper reactivity
+- Theme preference persists across app restarts via Drift database
 
 **Game State Pattern (Example from Two-Player Game):**
 

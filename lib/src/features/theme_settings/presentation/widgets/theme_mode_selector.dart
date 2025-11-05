@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tic_tac_toe/src/core/extensions/build_context_extensions.dart';
-import 'package:tic_tac_toe/src/core/providers/theme_mode_provider.dart';
+import 'package:tic_tac_toe/src/features/theme_settings/provider/theme_mode_provider.dart';
 import 'package:tic_tac_toe/src/shared/widgets/checkable_menu_item.dart';
 
 class ThemeModeSelector extends ConsumerWidget {
@@ -10,7 +10,7 @@ class ThemeModeSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final currentThemeMode = ref.watch(appThemeModeProvider);
+    final currentThemeMode = ref.watch(effectiveThemeModeProvider);
 
     return PopupMenuButton<ThemeMode>(
       key: const Key('menu_theme_button'),

@@ -10,7 +10,7 @@
       "references": [],
       "type": "table",
       "data": {
-        "name": "settings",
+        "name": "locale_settings",
         "was_declared_in_moor": false,
         "columns": [
           {
@@ -26,6 +26,41 @@
           {
             "name": "locale_code",
             "getter_name": "localeCode",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": null,
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "explicit_pk": ["id"]
+      }
+    },
+    {
+      "id": 1,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "theme_settings",
+        "was_declared_in_moor": false,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": null,
+            "default_dart": "const CustomExpression('1')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "theme_mode",
+            "getter_name": "themeMode",
             "moor_type": "string",
             "nullable": true,
             "customConstraints": null,
