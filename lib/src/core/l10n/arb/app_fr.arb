@@ -25,5 +25,7 @@
   "themeDark": "Sombre",
   "semanticCellEmpty": "Case {cellNumber}, vide",
   "semanticCellFilled": "Case {cellNumber}, remplie avec {symbol}",
-  "semanticGameStatus": "État du jeu"
+  "semanticGameStatus": "État du jeu",
+  "appInitializationError": "Échec de l'initialisation de l'application",
+  "retry": "Réessayer"
 }

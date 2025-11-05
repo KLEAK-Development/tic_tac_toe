@@ -9,10 +9,10 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tic_tac_toe/src/core/database/app_database.dart';
-import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
-
 import 'package:tic_tac_toe/src/app.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.dart';
+import 'package:tic_tac_toe/src/core/providers/app_startup_provider.dart';
+import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
 
 void main() {
   testWidgets('Menu screen displays new game button and controls', (
@@ -27,10 +27,15 @@ void main() {
       ProviderScope(
         overrides: [
           appDatabaseProvider.overrideWithValue(database),
+          // Skip app startup initialization in tests
+          appStartupProvider.overrideWith((ref) async {}),
         ],
         child: const App(),
       ),
     );
+
+    // Wait for async operations to complete
+    await tester.pumpAndSettle();
 
     // Verify that our menu screen displays the new game button
     expect(

@@ -438,6 +438,70 @@ The theme mode system uses a **separation of concerns** approach with **database
 - MaterialApp always receives a concrete ThemeMode, ensuring proper reactivity
 - Theme preference persists across app restarts via Drift database
 
+- **appStartupProvider**: Coordinates app initialization and loading state
+  - Returns `AsyncValue<void>` - async provider that runs once at app startup
+  - Uses `@Riverpod(keepAlive: true)` to persist throughout app lifetime
+  - Initializes both `appThemeModeProvider` and `appLocaleProvider` concurrently
+  - Used in MaterialApp.router's `builder` parameter to show loading/error states
+  - Provides centralized error handling with retry capability
+
+Example:
+```dart
+@Riverpod(keepAlive: true)
+Future<void> appStartup(Ref ref) async {
+  // Initialize theme mode and locale concurrently
+  await Future.wait([
+    ref.watch(appThemeModeProvider.future),
+    ref.watch(appLocaleProvider.future),
+  ]);
+}
+
+// Usage in App widget:
+MaterialApp.router(
+  locale: locale,
+  themeMode: themeMode,
+  // ... other config
+  builder: (context, child) {
+    final appStartupState = ref.watch(appStartupProvider);
+
+    return appStartupState.when(
+      data: (_) => child!,  // Show normal app content
+      loading: () => const AppLoadingWidget(),  // Show loading screen
+      error: (error, stack) => AppErrorWidget(  // Show error screen with retry
+        error: error,
+        onRetry: () => ref.invalidate(appStartupProvider),
+      ),
+    );
+  },
+)
+```
+
+**App Initialization Pattern:**
+
+The app uses MaterialApp.router's `builder` parameter to handle loading and error states:
+- `AppLoadingWidget` (`lib/src/shared/widgets/app_loading_widget.dart`): Simple Scaffold with CircularProgressIndicator
+- `AppErrorWidget` (`lib/src/shared/widgets/app_error_widget.dart`): Error screen with retry button
+- Both widgets inherit MaterialApp's theme and locale configuration
+- Loading/error screens are shown while database initialization is in progress
+- Once initialized, the normal app content (router child) is displayed
+
+**Testing with appStartupProvider:**
+
+In tests, override `appStartupProvider` to skip initialization:
+
+```dart
+await tester.pumpWidget(
+  ProviderScope(
+    overrides: [
+      appDatabaseProvider.overrideWithValue(database),
+      appStartupProvider.overrideWith((ref) async {}),  // Skip initialization
+    ],
+    child: const App(),
+  ),
+);
+await tester.pumpAndSettle();  // Wait for async operations
+```
+
 **Game State Pattern (Example from Two-Player Game):**
 
 ```dart
