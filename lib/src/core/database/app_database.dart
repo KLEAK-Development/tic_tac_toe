@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.steps.dart';
 import 'package:tic_tac_toe/src/features/locale_settings/data/tables/locale_settings_table.dart';
 import 'package:tic_tac_toe/src/features/theme_settings/data/tables/theme_settings_table.dart';
 
@@ -20,12 +21,16 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-    onUpgrade: (m, from, to) async {
-      if (from < 2) {
-        await m.createTable(themeSettings);
-      }
-    },
-  );
+        onUpgrade: stepByStep(
+          from1To2: (m, schema) async {
+            // Migration from v1 to v2:
+            // 1. Rename 'settings' table to 'locale_settings'
+            await m.renameTable(schema.localeSettings, 'settings');
+            // 2. Create new 'theme_settings' table
+            await m.createTable(schema.themeSettings);
+          },
+        ),
+      );
 }
 
 /// Open database connection with cross-platform support
