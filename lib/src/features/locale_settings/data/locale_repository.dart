@@ -68,8 +68,6 @@ class LocaleRepository {
       // Database error: fail silently to avoid disrupting user experience
       // The in-memory state will still work, just won't persist
       // In production, consider logging this error
-      print('Error saving locale: $e');
-      print('Stacktrace: $stacktrace');
     }
   }
 
