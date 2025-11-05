@@ -116,6 +116,7 @@ jobs:
           - integration_test/two_player_game_test.dart
           - integration_test/locale_switching_basic_test.dart
           - integration_test/locale_switching_comprehensive_test.dart
+          - integration_test/theme_mode_test.dart
       fail-fast: false
     env:
       CHROMIUM_FLAGS: "--headless --no-sandbox --disable-gpu --disable-dev-shm-usage"
@@ -181,5 +182,3 @@ jobs:
             --driver=test_driver/integration_test.dart \
             --target=${{ matrix.target }} \
             -d web-server)
-
-
