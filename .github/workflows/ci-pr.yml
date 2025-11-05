@@ -3,6 +3,16 @@ name: CI (PR)
 on:
   pull_request:
     branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "**.txt"
+      - "LICENSE"
+      - ".gitignore"
+      - ".editorconfig"
+      - ".vscode/**"
+      - ".idea/**"
+      - ".zed/**"
+      - "docs/**"
 
 jobs:
   setup-and-validation:
