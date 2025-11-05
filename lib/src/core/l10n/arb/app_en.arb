@@ -128,5 +128,13 @@
   "semanticGameStatus": "Game status",
   "@semanticGameStatus": {
     "description": "Semantic label for game status indicator"
+  },
+  "appInitializationError": "Failed to initialize app",
+  "@appInitializationError": {
+    "description": "Error message shown when app initialization fails"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Button text to retry an operation"
   }
 }

@@ -25,5 +25,7 @@
   "themeDark": "Dunkel",
   "semanticCellEmpty": "Feld {cellNumber}, leer",
   "semanticCellFilled": "Feld {cellNumber}, gefüllt mit {symbol}",
-  "semanticGameStatus": "Spielstatus"
+  "semanticGameStatus": "Spielstatus",
+  "appInitializationError": "Fehler beim Initialisieren der App",
+  "retry": "Wiederholen"
 }
