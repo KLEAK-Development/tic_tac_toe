@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tic_tac_toe/src/core/extensions/build_context_extensions.dart';
-import 'package:tic_tac_toe/src/core/providers/locale_provider.dart';
+import 'package:tic_tac_toe/src/features/locale_settings/provider/locale_provider.dart';
 import 'package:tic_tac_toe/src/shared/widgets/checkable_menu_item.dart';
 
 class LanguageSelector extends ConsumerWidget {
@@ -10,7 +10,13 @@ class LanguageSelector extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = context.l10n;
-    final currentLocale = ref.watch(appLocaleProvider);
+    final currentLocale = ref
+        .watch(appLocaleProvider)
+        .when(
+          data: (locale) => locale,
+          loading: () => null,
+          error: (_, _) => null,
+        );
 
     return PopupMenuButton<Locale?>(
       key: const Key('menu_language_button'),

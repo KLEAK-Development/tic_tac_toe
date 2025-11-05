@@ -1,11 +1,18 @@
+import 'package:drift/drift.dart' hide isNull;
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.dart';
 import 'package:tic_tac_toe/src/core/l10n/app_localizations.dart';
-import 'package:tic_tac_toe/src/core/providers/locale_provider.dart';
+import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
+import 'package:tic_tac_toe/src/features/locale_settings/provider/locale_provider.dart';
 import 'package:tic_tac_toe/src/features/locale_settings/presentation/widgets/language_selector.dart';
 
 void main() {
+  // Suppress Drift warning about multiple database instances in tests
+  // This is safe because each test creates its own isolated in-memory database
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   group('LanguageSelector', () {
     Widget buildTestWidget({Locale? initialLocale}) {
       return ProviderScope(
@@ -31,6 +38,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(buildTestWidget());
+      await tester.pumpAndSettle();
 
       // Open language menu
       await tester.tap(find.byKey(const Key('menu_language_button')));
@@ -54,6 +62,7 @@ void main() {
       await tester.pumpWidget(
         buildTestWidget(initialLocale: const Locale('fr')),
       );
+      await tester.pumpAndSettle();
 
       // Open language menu
       await tester.tap(find.byKey(const Key('menu_language_button')));
@@ -79,8 +88,14 @@ void main() {
     });
 
     testWidgets('can switch from System Default to French', (tester) async {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
+      final database = AppDatabase.forTesting(NativeDatabase.memory());
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
+      addTearDown(() async {
+        container.dispose();
+        await database.close();
+      });
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -99,7 +114,8 @@ void main() {
       );
 
       // Initially should be null (System Default)
-      expect(container.read(appLocaleProvider), isNull);
+      var locale = await container.read(appLocaleProvider.future);
+      expect(locale, isNull);
 
       // Open language menu
       await tester.tap(find.byKey(const Key('menu_language_button')));
@@ -110,20 +126,26 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify locale changed to French
-      expect(container.read(appLocaleProvider), equals(const Locale('fr')));
+      locale = await container.read(appLocaleProvider.future);
+      expect(locale, equals(const Locale('fr')));
     });
 
     testWidgets('can switch from French back to System Default', (
       tester,
     ) async {
+      final database = AppDatabase.forTesting(NativeDatabase.memory());
       final container = ProviderContainer(
         overrides: [
+          appDatabaseProvider.overrideWithValue(database),
           appLocaleProvider.overrideWith(
             () => TestAppLocale(const Locale('fr')),
           ),
         ],
       );
-      addTearDown(container.dispose);
+      addTearDown(() async {
+        container.dispose();
+        await database.close();
+      });
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -142,7 +164,8 @@ void main() {
       );
 
       // Initially should be French
-      expect(container.read(appLocaleProvider), equals(const Locale('fr')));
+      var locale = await container.read(appLocaleProvider.future);
+      expect(locale, equals(const Locale('fr')));
 
       // Open language menu
       await tester.tap(find.byKey(const Key('menu_language_button')));
@@ -153,12 +176,19 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify locale changed to null (System Default)
-      expect(container.read(appLocaleProvider), isNull);
+      locale = await container.read(appLocaleProvider.future);
+      expect(locale, isNull);
     });
 
     testWidgets('can switch between multiple languages', (tester) async {
-      final container = ProviderContainer();
-      addTearDown(container.dispose);
+      final database = AppDatabase.forTesting(NativeDatabase.memory());
+      final container = ProviderContainer(
+        overrides: [appDatabaseProvider.overrideWithValue(database)],
+      );
+      addTearDown(() async {
+        container.dispose();
+        await database.close();
+      });
 
       await tester.pumpWidget(
         UncontrolledProviderScope(
@@ -181,28 +211,32 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_language_fr')));
       await tester.pumpAndSettle();
-      expect(container.read(appLocaleProvider), equals(const Locale('fr')));
+      var locale = await container.read(appLocaleProvider.future);
+      expect(locale, equals(const Locale('fr')));
 
       // Switch to Spanish
       await tester.tap(find.byKey(const Key('menu_language_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_language_es')));
       await tester.pumpAndSettle();
-      expect(container.read(appLocaleProvider), equals(const Locale('es')));
+      locale = await container.read(appLocaleProvider.future);
+      expect(locale, equals(const Locale('es')));
 
       // Switch to German
       await tester.tap(find.byKey(const Key('menu_language_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_language_de')));
       await tester.pumpAndSettle();
-      expect(container.read(appLocaleProvider), equals(const Locale('de')));
+      locale = await container.read(appLocaleProvider.future);
+      expect(locale, equals(const Locale('de')));
 
       // Switch back to System Default
       await tester.tap(find.byKey(const Key('menu_language_button')));
       await tester.pumpAndSettle();
       await tester.tap(find.byKey(const Key('menu_language_system')));
       await tester.pumpAndSettle();
-      expect(container.read(appLocaleProvider), isNull);
+      locale = await container.read(appLocaleProvider.future);
+      expect(locale, isNull);
     });
   });
 }
@@ -214,7 +248,7 @@ class TestAppLocale extends AppLocale {
   final Locale? initialLocale;
 
   @override
-  Locale? build() {
+  Future<Locale?> build() async {
     return initialLocale;
   }
 }

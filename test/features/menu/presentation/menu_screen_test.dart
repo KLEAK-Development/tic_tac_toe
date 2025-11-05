@@ -1,14 +1,30 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tic_tac_toe/src/core/database/app_database.dart';
 import 'package:tic_tac_toe/src/core/l10n/app_localizations.dart';
+import 'package:tic_tac_toe/src/core/providers/database_provider.dart';
 import 'package:tic_tac_toe/src/features/menu/presentation/menu_screen.dart';
 
 void main() {
   group('MenuScreen', () {
+    late AppDatabase database;
+
+    setUp(() {
+      database = AppDatabase.forTesting(NativeDatabase.memory());
+    });
+
+    tearDown(() async {
+      await database.close();
+    });
+
     Widget buildTestWidget() {
-      return const ProviderScope(
-        child: MaterialApp(
+      return ProviderScope(
+        overrides: [
+          appDatabaseProvider.overrideWithValue(database),
+        ],
+        child: const MaterialApp(
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: MenuScreen(),

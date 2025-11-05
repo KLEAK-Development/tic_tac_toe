@@ -206,6 +206,7 @@ lib/
 └── src/
     ├── app.dart             # Root app widget
     ├── core/                # Shared utilities, constants, themes
+    │   ├── database/        # Database infrastructure
     │   ├── extensions/      # BuildContext and other core extensions
     │   ├── l10n/            # Localization
     │   │   └── arb/         # ARB translation files
@@ -219,6 +220,7 @@ lib/
     │   │   └── presentation/
     │   │       └── widgets/
     │   ├── locale_settings/ # Language/locale selection feature
+    │   │   ├── data/        # Locale repository (database operations)
     │   │   └── presentation/
     │   │       └── widgets/
     │   ├── game_modes/      # Game mode features
@@ -258,9 +260,10 @@ organized under `lib/src/`.
 App-level providers that are used across the entire application:
 
 - **appLocaleProvider**: Controls the app's locale for internationalization
-  - Returns `Locale?` (null = use device locale)
+  - Returns `AsyncValue<Locale?>` (null = use device locale)
   - Provides `setLocale(Locale?)` method to change language at runtime
   - Automatically converts `systemDefaultLocale` sentinel to null
+  - Persists locale preference to database using Drift
   - Accessible via language selector in menu screen AppBar
 
 Example:
@@ -268,22 +271,38 @@ Example:
 @riverpod
 class AppLocale extends _$AppLocale {
   @override
-  Locale? build() {
-    return null;  // Use device locale by default
+  Future<Locale?> build() async {
+    // Load saved locale from database
+    final repository = ref.read(localeRepositoryProvider);
+    return await repository.getLocale();
   }
 
-  void setLocale(Locale? newLocale) {
+  Future<void> setLocale(Locale? newLocale) async {
     // Convert sentinel value to null automatically
-    state = (newLocale == systemDefaultLocale) ? null : newLocale;
+    final locale = (newLocale == systemDefaultLocale) ? null : newLocale;
+
+    // Update state immediately (fire-and-forget pattern)
+    state = AsyncValue.data(locale);
+
+    // Save to database asynchronously
+    final repository = ref.read(localeRepositoryProvider);
+    repository.saveLocale(locale);
   }
 }
 
-// Usage in UI:
-final currentLocale = ref.watch(appLocaleProvider);
-ref.read(appLocaleProvider.notifier).setLocale(const Locale('fr'));
+// Usage in UI (must handle AsyncValue):
+final asyncLocale = ref.watch(appLocaleProvider);
+final currentLocale = asyncLocale.when(
+  data: (locale) => locale,
+  loading: () => null,
+  error: (_, __) => null,
+);
+
+// Calling setLocale:
+await ref.read(appLocaleProvider.notifier).setLocale(const Locale('fr'));
 
 // Using the sentinel value (useful for PopupMenuButton):
-ref.read(appLocaleProvider.notifier).setLocale(systemDefaultLocale);
+await ref.read(appLocaleProvider.notifier).setLocale(systemDefaultLocale);
 ```
 
 - **systemDefaultLocale** (sentinel constant): `Locale('__system__')`
@@ -331,13 +350,15 @@ return MaterialApp.router(
 
 **Locale Management Pattern:**
 
-The locale system uses a **separation of concerns** approach:
-- `appLocaleProvider` stores the user's preference (nullable)
+The locale system uses a **separation of concerns** approach with **database persistence**:
+- `appLocaleProvider` stores the user's preference (nullable, async) and persists to database
+- `localeRepository` handles database CRUD operations for locale preferences
 - `effectiveLocaleProvider` computes the actual locale to use (always concrete)
 - This allows the user to explicitly select a language OR use system default
 - When user selects "System Default", appLocaleProvider becomes null, but
   effectiveLocaleProvider still returns a concrete system Locale
 - MaterialApp always receives a concrete Locale, ensuring proper reactivity
+- Locale preference persists across app restarts via Drift database
 
 - **appThemeModeProvider**: Controls the app's theme mode
   - Returns `ThemeMode` (system, light, or dark)
@@ -604,15 +625,174 @@ Key dependencies in this project:
 - `go_router` - Declarative routing framework
 - `flutter_localizations` - SDK package for localization support
 - `intl` - Internationalization and localization support
+- `drift` - SQLite ORM for Flutter persistence
+- `drift_flutter` - Cross-platform Drift database support (web + mobile)
+- `path_provider` - File system path access for database storage
 - `riverpod_generator` - Riverpod code generation (dev dependency)
 - `go_router_builder` - Type-safe routing code generation (dev dependency)
 - `build_runner` - Code generation runner (dev dependency)
+- `drift_dev` - Drift code generation (dev dependency)
 - `integration_test` - Flutter integration testing framework (dev dependency)
+
+## Database Layer
+
+This project uses **Drift** (SQLite ORM) for local data persistence. The database layer follows the features-based architecture principle where core database infrastructure is shared, but data operations (repositories) are owned by individual features.
+
+### Database Architecture
+
+**Core Database Infrastructure** (`lib/src/core/database/`):
+
+- **AppDatabase** (`app_database.dart`): Shared database class that defines tables
+- Tables are defined centrally but accessed through feature-owned repositories
+- Uses single-row pattern for app-level settings (id=1)
+- Cross-platform support via `drift_flutter` (web + mobile)
+
+```dart
+@DriftDatabase(tables: [Settings])
+class AppDatabase extends _$AppDatabase {
+  AppDatabase() : super(_openConnection());
+  AppDatabase.forTesting(super.executor);  // For in-memory test databases
+
+  @override
+  int get schemaVersion => 1;
+
+  static QueryExecutor _openConnection() {
+    return driftDatabase(
+      name: 'app_database',
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.js'),
+      ),
+    );
+  }
+}
+```
+
+**Database Provider** (`lib/src/core/providers/database_provider.dart`):
+
+Provides a singleton database instance with proper cleanup:
+
+```dart
+@riverpod
+AppDatabase appDatabase(Ref ref) {
+  final db = AppDatabase();
+  ref.onDispose(() {
+    db.close();
+  });
+  return db;
+}
+```
+
+**Feature-Owned Repositories** (`lib/src/features/*/data/`):
+
+Each feature owns its data operations through repository classes:
+
+```dart
+// Example: lib/src/features/locale_settings/data/locale_repository.dart
+class LocaleRepository {
+  final AppDatabase _db;
+  LocaleRepository(this._db);
+
+  Future<Locale?> getLocale() async {
+    // Read from database
+  }
+
+  Future<void> saveLocale(Locale? locale) async {
+    // Write to database
+  }
+}
+
+// Repository provider
+@riverpod
+LocaleRepository localeRepository(Ref ref) {
+  final db = ref.watch(appDatabaseProvider);
+  return LocaleRepository(db);
+}
+```
+
+### Database Testing Patterns
+
+**In-Memory Databases for Tests:**
+
+All tests use in-memory databases to ensure test isolation and avoid file system dependencies:
+
+```dart
+setUp(() {
+  database = AppDatabase.forTesting(NativeDatabase.memory());
+  container = ProviderContainer(
+    overrides: [
+      appDatabaseProvider.overrideWithValue(database),
+    ],
+  );
+});
+
+tearDown(() async {
+  container.dispose();
+  await database.close();
+});
+```
+
+**Widget Tests with Database:**
+
+Widget tests that use providers depending on the database must override `appDatabaseProvider`:
+
+```dart
+testWidgets('my widget test', (tester) async {
+  final database = AppDatabase.forTesting(NativeDatabase.memory());
+  addTearDown(() async => await database.close());
+
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        appDatabaseProvider.overrideWithValue(database),
+      ],
+      child: const MyWidget(),
+    ),
+  );
+
+  // Wait for async providers to resolve
+  await tester.pumpAndSettle();
+
+  // Test assertions...
+});
+```
+
+**Suppressing Multiple Database Warnings:**
+
+When running tests that create multiple database instances (which is safe because each test uses isolated in-memory databases), suppress the debug warning:
+
+```dart
+void main() {
+  // Suppress Drift warning about multiple database instances in tests
+  // This is safe because each test creates its own isolated in-memory database
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+
+  group('MyTests', () {
+    // Tests...
+  });
+}
+```
+
+**Import Conflict Resolution:**
+
+Drift exports an `isNull` function that conflicts with the matcher package. Use selective imports:
+
+```dart
+import 'package:drift/drift.dart' hide isNull;
+import 'package:drift/native.dart';
+```
+
+### Database Best Practices
+
+- **Fire-and-Forget Writes**: UI-triggered database writes don't block (update UI state immediately, save to database asynchronously)
+- **Graceful Error Handling**: Repository methods return null or fail silently on errors to avoid crashing the app
+- **Single-Row Settings Pattern**: App-level preferences use a single row with id=1
+- **Features Own Data**: Each feature owns its repository, even if using shared database tables
+- **Test Isolation**: Always use in-memory databases in tests with proper cleanup
 
 ## Code Generation
 
-This project uses code generation for both Riverpod providers and go_router
-routes.
+This project uses code generation for Riverpod providers, go_router routes, and Drift database code.
 
 **Generate code after making changes:**
 
@@ -626,13 +806,15 @@ fvm flutter pub run build_runner build --delete-conflicting-outputs  # Clean bui
 
 - After adding or modifying `@TypedGoRoute` route definitions
 - After adding or modifying `@riverpod` provider definitions
+- After adding or modifying `@DriftDatabase` or table definitions
 - When you see errors about missing generated files (`.g.dart` files)
 
 **Generated files:**
 
 - `lib/src/core/routing/app_router.g.dart` - Generated routing code
-- Any file with `.g.dart` extension is auto-generated and should not be manually
-  edited
+- `lib/src/core/database/app_database.g.dart` - Generated Drift database code
+- `lib/src/core/providers/*.g.dart` - Generated Riverpod provider code
+- Any file with `.g.dart` extension is auto-generated and should not be manually edited
 
 ## Internationalization (i18n)
 
@@ -761,6 +943,7 @@ test/
     │   └── presentation/
     │       └── widgets/     # ThemeModeSelector widget tests
     ├── locale_settings/
+    │   ├── data/            # Locale repository tests (database operations)
     │   └── presentation/
     │       └── widgets/     # LanguageSelector widget tests
     └── game_modes/
@@ -788,13 +971,15 @@ integration_test/
   board state checks
 - **Models** (23 tests): Player properties, GameState immutability, GameStatus
   behavior
-- **Providers** (47 tests):
+- **Providers** (66 tests):
   - Game Provider (26 tests): State transitions, move handling, game reset, win/draw
     scenarios
   - Theme Provider (6 tests): Theme mode state management, MaterialApp integration,
     theme persistence
-  - Locale Provider (15 tests): Locale state management (9 tests including sentinel
-    conversion), effective locale computation and reactivity (6 tests)
+  - Locale Provider (30 tests): Async locale state management (12 tests including sentinel
+    conversion and persistence), effective locale computation and reactivity (6 tests),
+    database persistence (12 tests)
+  - Locale Repository (17 tests): Database CRUD operations for locale preferences
 - **Widget Tests** (25 tests):
   - Main menu (1 test): App initialization with menu screen
   - Menu screen (1 test): Integration test verifying all components are present
@@ -808,7 +993,7 @@ integration_test/
   - Basic Locale Switching (locale_switching_basic_test.dart): Verifies switching to French and back to System Default
   - Comprehensive Locale Switching (locale_switching_comprehensive_test.dart): Verifies switching through all languages (en → fr → es → de → system)
 
-**Total: 121 tests passing (114 unit/widget tests + 5 integration testWidgets across 3 files)**
+**Total: 140 tests passing (133 unit/widget tests + 5 integration testWidgets across 3 files)**
 
 **Running Tests:**
 
