@@ -116,6 +116,7 @@ jobs:
           - integration_test/two_player_game_test.dart
           - integration_test/locale_switching_basic_test.dart
           - integration_test/locale_switching_comprehensive_test.dart
+          - integration_test/theme_mode_persistence.dart
       fail-fast: false
     env:
       CHROMIUM_FLAGS: "--headless --no-sandbox --disable-gpu --disable-dev-shm-usage"
@@ -242,5 +243,3 @@ jobs:
       - name: Deploy artifact
         id: deployment
         uses: actions/deploy-pages@v4
-
-
