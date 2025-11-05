@@ -64,7 +64,7 @@ class LocaleRepository {
               localeCode: Value(localeCode),
             ),
           );
-    } catch (e, stacktrace) {
+    } catch (_) {
       // Database error: fail silently to avoid disrupting user experience
       // The in-memory state will still work, just won't persist
       // In production, consider logging this error
