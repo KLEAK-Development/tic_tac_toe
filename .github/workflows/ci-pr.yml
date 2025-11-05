@@ -175,13 +175,11 @@ jobs:
             --no-pub \
             --driver=test_driver/integration_test.dart \
             --target=${{ matrix.target }} \
-            --web-renderer=html \
             -d web-server) || \
           (flutter drive \
             --no-pub \
             --driver=test_driver/integration_test.dart \
             --target=${{ matrix.target }} \
-            --web-renderer=html \
             -d web-server)
 
 
