@@ -88,7 +88,7 @@ jobs:
         run: flutter gen-l10n
 
       - name: Run tests with coverage
-        run: flutter test --coverage
+        run: flutter test --coverage --concurrency 4
 
       - name: Upload coverage reports to Codecov
         if: matrix.flutter-channel == 'stable'
@@ -112,7 +112,13 @@ jobs:
     strategy:
       matrix:
         flutter-channel: [stable, beta, master]
+        target:
+          - integration_test/two_player_game_test.dart
+          - integration_test/locale_switching_basic_test.dart
+          - integration_test/locale_switching_comprehensive_test.dart
       fail-fast: false
+    env:
+      CHROMIUM_FLAGS: "--headless --no-sandbox --disable-gpu --disable-dev-shm-usage"
 
     steps:
       - name: Checkout code
@@ -146,40 +152,37 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Cache Flutter/Dart build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.dartServer/.analysis-driver
+            .dart_tool
+            build
+          key: ${{ runner.os }}-flutter-build-${{ matrix.flutter-channel }}-${{ hashFiles('**/pubspec.lock') }}-${{ hashFiles('integration_test/**') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-build-${{ matrix.flutter-channel }}-
+
       - name: Generate localizations
         run: flutter gen-l10n
 
       - name: Run code generation
         run: flutter pub run build_runner build --delete-conflicting-outputs
 
-      - name: Run integration tests - Two Player Game
+      - name: Run integration test (${{ matrix.target }})
         run: |
           (flutter drive \
             --no-pub \
             --driver=test_driver/integration_test.dart \
-            --target=integration_test/two_player_game_test.dart \
+            --target=${{ matrix.target }} \
+            --web-renderer=html \
             -d web-server) || \
-            (flutter drive \
+          (flutter drive \
             --no-pub \
             --driver=test_driver/integration_test.dart \
-            --target=integration_test/two_player_game_test.dart \
+            --target=${{ matrix.target }} \
+            --web-renderer=html \
             -d web-server)
-
-      - name: Run integration tests - Basic Locale Switching
-        run: |
-          flutter drive \
-            --no-pub \
-            --driver=test_driver/integration_test.dart \
-            --target=integration_test/locale_switching_basic_test.dart \
-            -d web-server
-
-      - name: Run integration tests - Comprehensive Locale Switching
-        run: |
-          flutter drive \
-            --no-pub \
-            --driver=test_driver/integration_test.dart \
-            --target=integration_test/locale_switching_comprehensive_test.dart \
-            -d web-server
 
   build-web:
     name: Build Web Release
