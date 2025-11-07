@@ -1,6 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:tic_tac_toe/src/features/locale_settings/provider/locale_provider.dart';
-import 'package:tic_tac_toe/src/features/theme_settings/provider/theme_mode_provider.dart';
+import 'package:tic_tac_toe/src/features/locale_settings/locale_settings.dart';
+import 'package:tic_tac_toe/src/features/theme_settings/theme_settings.dart';
 
 part 'app_startup_provider.g.dart';
 
@@ -28,9 +28,9 @@ part 'app_startup_provider.g.dart';
 @Riverpod(keepAlive: true)
 Future<void> appStartup(Ref ref) async {
   // Initialize theme mode and locale concurrently
-  // Using .future ensures we wait for the async providers to complete
+  // Each feature controls its own initialization logic
   await Future.wait([
-    ref.watch(appThemeModeProvider.future),
-    ref.watch(appLocaleProvider.future),
+    initializeThemeSettings(ref),
+    initializeLocaleSettings(ref),
   ]);
 }
