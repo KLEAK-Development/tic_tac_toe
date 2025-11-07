@@ -20,16 +20,11 @@ class ThemeModeRepository {
       final value = setting?.themeMode;
       if (value == null) return ThemeMode.system; // null => system
 
-      switch (value) {
-        case 'light':
-          return ThemeMode.light;
-        case 'dark':
-          return ThemeMode.dark;
-        case 'system':
-          return ThemeMode.system;
-        default:
-          return ThemeMode.system; // invalid => system
-      }
+      return switch (value) {
+        'light' => ThemeMode.light,
+        'dark' => ThemeMode.dark,
+        _ => ThemeMode.system,
+      };
     } catch (_) {
       return ThemeMode.system;
     }
@@ -38,18 +33,11 @@ class ThemeModeRepository {
   /// Persist theme mode. Store null for system, or concrete string otherwise
   Future<void> saveThemeMode(ThemeMode mode) async {
     try {
-      final String? value;
-      switch (mode) {
-        case ThemeMode.light:
-          value = 'light';
-          break;
-        case ThemeMode.dark:
-          value = 'dark';
-          break;
-        case ThemeMode.system:
-          value = null; // store null for system
-          break;
-      }
+      final String? value = switch (mode) {
+        ThemeMode.light => 'light',
+        ThemeMode.dark => 'dark',
+        ThemeMode.system => null,
+      };
 
       await _db
           .into(_db.themeSettings)

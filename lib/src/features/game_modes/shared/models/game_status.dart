@@ -13,14 +13,10 @@ enum GameStatus {
 
   /// Returns the winner, or null if no winner
   Player? get winner {
-    switch (this) {
-      case GameStatus.xWins:
-        return Player.x;
-      case GameStatus.oWins:
-        return Player.o;
-      case GameStatus.playing:
-      case GameStatus.draw:
-        return null;
-    }
+    return switch (this) {
+      GameStatus.xWins => Player.x,
+      GameStatus.oWins => Player.o,
+      GameStatus.playing || GameStatus.draw => null,
+    };
   }
 }

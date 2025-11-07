@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:tic_tac_toe/src/features/game_modes/two_player/presentation/two_player_game_screen.dart';
-import 'package:tic_tac_toe/src/features/menu/presentation/menu_screen.dart';
+import 'package:tic_tac_toe/src/features/menu/menu.dart';
+import 'package:tic_tac_toe/src/features/game_modes/two_player/two_player.dart';
 
 part 'app_router.g.dart';
 

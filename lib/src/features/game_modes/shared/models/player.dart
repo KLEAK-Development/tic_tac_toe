@@ -6,31 +6,25 @@ enum Player {
 
   /// Returns the symbol to display for this player
   String get symbol {
-    switch (this) {
-      case Player.x:
-        return 'X';
-      case Player.o:
-        return 'O';
-    }
+    return switch (this) {
+      Player.x => 'X',
+      Player.o => 'O',
+    };
   }
 
   /// Returns the opposite player
   Player get opposite {
-    switch (this) {
-      case Player.x:
-        return Player.o;
-      case Player.o:
-        return Player.x;
-    }
+    return switch (this) {
+      Player.x => Player.o,
+      Player.o => Player.x,
+    };
   }
 
   /// Returns the theme-appropriate color for this player
   Color color(ColorScheme colorScheme) {
-    switch (this) {
-      case Player.x:
-        return colorScheme.primary;
-      case Player.o:
-        return colorScheme.secondary;
-    }
+    return switch (this) {
+      Player.x => colorScheme.primary,
+      Player.o => colorScheme.secondary,
+    };
   }
 }

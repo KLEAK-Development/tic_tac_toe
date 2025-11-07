@@ -6,11 +6,10 @@ extension PlayerL10n on Player {
   /// Returns a localized display name for the player
   String displayName(BuildContext context) {
     final l10n = context.l10n;
-    switch (this) {
-      case Player.x:
-        return l10n.playerX;
-      case Player.o:
-        return l10n.playerO;
-    }
+
+    return switch (this) {
+      Player.x => l10n.playerX,
+      Player.o => l10n.playerO,
+    };
   }
 }

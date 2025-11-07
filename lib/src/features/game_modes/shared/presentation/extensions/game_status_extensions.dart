@@ -6,15 +6,12 @@ extension GameStatusL10n on GameStatus {
   /// Returns a localized message for the game status
   String message(BuildContext context) {
     final l10n = context.l10n;
-    switch (this) {
-      case GameStatus.playing:
-        return '';
-      case GameStatus.xWins:
-        return l10n.playerXWins;
-      case GameStatus.oWins:
-        return l10n.playerOWins;
-      case GameStatus.draw:
-        return l10n.draw;
-    }
+
+    return switch (this) {
+      GameStatus.playing => '',
+      GameStatus.xWins => l10n.playerXWins,
+      GameStatus.oWins => l10n.playerOWins,
+      GameStatus.draw => l10n.draw,
+    };
   }
 }
