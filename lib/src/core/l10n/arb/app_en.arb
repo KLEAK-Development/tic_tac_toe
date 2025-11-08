@@ -8,6 +8,10 @@
   "@newGame": {
     "description": "Button text to start a new game"
   },
+  "singlePlayerGame": "vs Computer",
+  "@singlePlayerGame": {
+    "description": "Title for single player game mode (playing against computer)"
+  },
   "twoPlayerGame": "Two Player Game",
   "@twoPlayerGame": {
     "description": "Title for two player game mode"

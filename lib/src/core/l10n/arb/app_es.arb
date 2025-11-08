@@ -2,6 +2,7 @@
   "@@locale": "es",
   "appTitle": "Tres en Raya",
   "newGame": "Nueva Partida",
+  "singlePlayerGame": "contra la Computadora",
   "twoPlayerGame": "Juego de Dos Jugadores",
   "playerX": "Jugador X",
   "playerO": "Jugador O",

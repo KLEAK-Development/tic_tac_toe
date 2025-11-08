@@ -3,17 +3,21 @@ import 'package:tic_tac_toe/src/features/game_modes/shared/logic/game_logic.dart
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/game_state.dart';
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/game_status.dart';
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/player.dart';
+import 'package:tic_tac_toe/src/features/game_modes/shared/providers/game_provider.dart';
 
 part 'game_provider.g.dart';
 
 @riverpod
-class TwoPlayerGame extends _$TwoPlayerGame {
+class TwoPlayerGame extends _$TwoPlayerGame
+    with GameNotifierMixin
+    implements GameNotifier {
   @override
   GameState build() {
     return GameState.initial();
   }
 
   /// Makes a move at the specified index
+  @override
   void makeMove(int index) {
     // Only allow moves if game is still playing
     if (state.status != GameStatus.playing) {
@@ -47,10 +51,5 @@ class TwoPlayerGame extends _$TwoPlayerGame {
           : state.currentPlayer,
       status: newStatus,
     );
-  }
-
-  /// Resets the game to initial state
-  void resetGame() {
-    state = GameState.initial();
   }
 }

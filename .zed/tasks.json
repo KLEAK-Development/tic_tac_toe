@@ -8,6 +8,16 @@
     "hide": "on_success"
   },
   {
+    "label": "Gen l10n",
+    "command": "fvm flutter gen-l10n",
+    "hide": "on_success"
+  },
+  {
+    "label": "Build runner",
+    "command": "fvm flutter pub run build_runner build --delete-conflicting-outputs",
+    "hide": "on_success"
+  },
+  {
     "label": "Run integration theme mode",
     "command": "fvm flutter drive --no-pub --driver=test_driver/integration_test.dart --target=integration_test/theme_mode_persistence_test.dart -d web-server",
     "hide": "on_success"

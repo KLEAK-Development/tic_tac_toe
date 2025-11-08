@@ -2,6 +2,7 @@
   "@@locale": "fr",
   "appTitle": "Morpion",
   "newGame": "Nouvelle Partie",
+  "singlePlayerGame": "contre l'Ordinateur",
   "twoPlayerGame": "Jeu à Deux Joueurs",
   "playerX": "Joueur X",
   "playerO": "Joueur O",
