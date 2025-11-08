@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/player.dart';
 
 /// All possible winning combinations on a tic-tac-toe board
@@ -46,4 +48,62 @@ extension GameBoardExtension on List<Player?> {
     }
     return this[index] == null;
   }
+}
+
+/// Finds the best move for the computer player
+/// Strategy: Block player wins, otherwise pick random available cell
+int findComputerMove(List<Player?> board, Player computerPlayer) {
+  final humanPlayer = computerPlayer.opposite;
+
+  // First, check if computer can win in the next move
+  final winningMove = _findWinningMove(board, computerPlayer);
+  if (winningMove != null) {
+    return winningMove;
+  }
+
+  // Second, check if human player can win on their next move and block it
+  final blockingMove = _findWinningMove(board, humanPlayer);
+  if (blockingMove != null) {
+    return blockingMove;
+  }
+
+  // Otherwise, pick a random available cell
+  final availableMoves = <int>[];
+  for (int i = 0; i < board.length; i++) {
+    if (board.isValidMove(i)) {
+      availableMoves.add(i);
+    }
+  }
+
+  if (availableMoves.isEmpty) {
+    throw StateError('No available moves on the board');
+  }
+
+  final random = math.Random();
+  return availableMoves[random.nextInt(availableMoves.length)];
+}
+
+/// Helper function to find a winning move for the given player
+/// Returns null if no winning move is available
+int? _findWinningMove(List<Player?> board, Player player) {
+  for (final combination in winningCombinations) {
+    // Count how many cells in this combination the player occupies
+    int playerCount = 0;
+    int? emptyCell;
+
+    for (final index in combination) {
+      if (board[index] == player) {
+        playerCount++;
+      } else if (board[index] == null) {
+        emptyCell = index;
+      }
+    }
+
+    // If player has 2 cells and one is empty, that's a winning move
+    if (playerCount == 2 && emptyCell != null) {
+      return emptyCell;
+    }
+  }
+
+  return null;
 }

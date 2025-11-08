@@ -22,6 +22,12 @@ class MenuRobot {
     await tester.pumpAndSettle();
   }
 
+  /// Start a single-player game (vs Computer)
+  Future<void> startSinglePlayerGame() async {
+    await tester.tap(find.byKey(const Key('menu_single_player_game_button')));
+    await tester.pumpAndSettle();
+  }
+
   /// Get the app title text from the menu screen
   String getAppTitleText() {
     final titleFinder = find.byKey(const Key('menu_app_title'));

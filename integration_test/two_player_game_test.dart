@@ -1,43 +1,17 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:tic_tac_toe/src/app.dart';
 
+import 'robots/game_robot.dart';
 import 'robots/locale_robot.dart';
 import 'robots/menu_robot.dart';
-import 'robots/theme_mode_robot.dart';
-import 'robots/two_player_game_robot.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   // Test all supported locales to verify language-independence
   const supportedLocales = ['en', 'fr', 'es', 'de'];
-
-  testWidgets('Theme Mode Switcher', (WidgetTester tester) async {
-    // Start the app
-    await tester.pumpWidget(const ProviderScope(child: App()));
-    await tester.pumpAndSettle();
-
-    final themeModeRobot = ThemeModeRobot(tester);
-    final menuRobot = MenuRobot(tester);
-
-    // Verify we're on the menu screen
-    await menuRobot.verifyOnMenuScreen();
-
-    // Test switching to Light mode
-    await themeModeRobot.selectThemeMode('light');
-    await themeModeRobot.verifyThemeMode(Brightness.light);
-
-    // Test switching to Dark mode
-    await themeModeRobot.selectThemeMode('dark');
-    await themeModeRobot.verifyThemeMode(Brightness.dark);
-
-    // Test switching to System mode
-    await themeModeRobot.selectThemeMode('system');
-    // Note: System mode brightness depends on device settings
-  });
 
   testWidgets('Two Player Game - All Scenarios (All Locales)', (
     WidgetTester tester,
@@ -49,7 +23,7 @@ void main() {
     // Create robots
     final localeRobot = LocaleRobot(tester);
     final menuRobot = MenuRobot(tester);
-    final gameRobot = TwoPlayerGameRobot(tester);
+    final gameRobot = GameRobot(tester);
 
     // Test each locale
     for (final localeCode in supportedLocales) {

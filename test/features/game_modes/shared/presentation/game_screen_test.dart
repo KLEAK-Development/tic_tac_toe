@@ -6,7 +6,9 @@ import 'package:tic_tac_toe/src/features/game_modes/two_player/presentation/two_
 import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
-  group('Two Player Game Widgets -', () {
+  group('Shared GameScreen -', () {
+    // Note: Uses TwoPlayerGameScreen to provide gameProvider override
+    // Tests are mode-agnostic and verify shared GameScreen components
     Widget buildTestWidget() {
       return ProviderScope(
         child: MaterialApp(

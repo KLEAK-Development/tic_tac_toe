@@ -2,6 +2,7 @@
   "@@locale": "de",
   "appTitle": "Tic Tac Toe",
   "newGame": "Neues Spiel",
+  "singlePlayerGame": "gegen Computer",
   "twoPlayerGame": "Zwei-Spieler-Spiel",
   "playerX": "Spieler X",
   "playerO": "Spieler O",
