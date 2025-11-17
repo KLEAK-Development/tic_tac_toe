@@ -4,6 +4,7 @@
 /// functionality, following the fractal feature pattern. The settings feature
 /// contains theme and locale sub-features, each with their own data, providers,
 /// and presentation layers.
+library;
 
 // Theme settings sub-feature
 export 'theme/theme.dart';
