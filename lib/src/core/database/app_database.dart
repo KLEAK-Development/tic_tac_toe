@@ -1,8 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:tic_tac_toe/src/core/database/app_database.steps.dart';
-import 'package:tic_tac_toe/src/features/locale_settings/locale_settings.dart';
-import 'package:tic_tac_toe/src/features/theme_settings/theme_settings.dart';
+import 'package:tic_tac_toe/src/features/settings/settings.dart';
 
 part 'app_database.g.dart';
 

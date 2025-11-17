@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:tic_tac_toe/src/features/locale_settings/locale_settings.dart';
-import 'package:tic_tac_toe/src/features/theme_settings/theme_settings.dart';
+import 'package:tic_tac_toe/src/features/settings/settings.dart';
 
 part 'app_startup_provider.g.dart';
 

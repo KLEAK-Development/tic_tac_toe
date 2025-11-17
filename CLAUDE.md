@@ -68,17 +68,66 @@ lib/
     │   ├── providers/       # Core app-level providers
     │   ├── routing/         # go_router configuration
     │   └── theme/           # Theme configuration and spacing constants
-    ├── features/            # Feature modules
+    ├── features/            # Feature modules (fractal architecture)
     │   ├── menu/
-    │   ├── theme_settings/  # Theme mode selection
-    │   ├── locale_settings/ # Language/locale selection
-    │   └── game_modes/
+    │   ├── settings/        # Settings feature (fractal parent)
+    │   │   ├── settings.dart # Barrel export
+    │   │   ├── theme/       # Theme mode selection sub-feature
+    │   │   │   ├── theme.dart
+    │   │   │   ├── providers/
+    │   │   │   ├── data/
+    │   │   │   └── presentation/
+    │   │   └── locale/      # Language/locale selection sub-feature
+    │   │       ├── locale.dart
+    │   │       ├── providers/
+    │   │       ├── data/
+    │   │       └── presentation/
+    │   └── game_modes/      # Game modes feature (fractal parent)
     │       ├── shared/      # Shared game logic, models, extensions
-    │       └── two_player/  # Two-player local game
+    │       └── two_player/  # Two-player local game sub-feature
     └── shared/widgets/      # Shared widgets (CheckableMenuItem, etc.)
 ```
 
 **Important:** Only `main.dart` should be in `lib/`. All other code must be in `lib/src/`.
+
+### Fractal Architecture Pattern
+
+The codebase uses a **fractal architecture** pattern where complex features can contain sub-features with the same internal structure. This provides excellent scalability and organization.
+
+**Example: Settings Feature**
+
+The `settings` feature demonstrates fractal architecture:
+
+```
+features/settings/
+├── settings.dart           # Parent barrel (cascading re-exports)
+├── theme/                  # Theme sub-feature
+│   ├── theme.dart          # Sub-feature barrel
+│   ├── providers/          # Theme-specific providers
+│   ├── data/               # Theme repository & tables
+│   └── presentation/       # Theme widgets
+└── locale/                 # Locale sub-feature
+    ├── locale.dart         # Sub-feature barrel
+    ├── providers/          # Locale-specific providers
+    ├── data/               # Locale repository & tables
+    └── presentation/       # Locale widgets
+```
+
+**Usage:**
+```dart
+// Single import for all settings functionality
+import 'package:tic_tac_toe/src/features/settings/settings.dart';
+
+// Access theme and locale providers, widgets, and tables
+final themeMode = ref.watch(effectiveThemeModeProvider);
+final locale = ref.watch(effectiveLocaleProvider);
+```
+
+**Benefits:**
+- **Scalability**: Easy to add new settings sub-features (privacy, notifications, etc.)
+- **Organization**: Related features grouped together logically
+- **Encapsulation**: Each sub-feature is self-contained with its own data/providers/UI
+- **Clean imports**: Single barrel export point for consumers
 
 ### State Management - Riverpod v2
 
@@ -88,9 +137,12 @@ lib/
 - Use `@riverpod` annotation for generated providers
 - Notifier classes extend `_$NotifierName` for complex state
 
-**Core Providers:**
+**Key Providers:**
+
+**Settings Feature Providers** (`lib/src/features/settings/`):
 
 - **appLocaleProvider**: Async locale preference (null = system default)
+  - Location: `settings/locale/provider/locale_provider.dart`
   - `setLocale(Locale?)` to change language
   - Persists to Drift database
   - Converts `systemDefaultLocale` sentinel to null automatically
@@ -100,6 +152,7 @@ lib/
   - Used by MaterialApp.router
 
 - **appThemeModeProvider**: Async theme mode preference
+  - Location: `settings/theme/provider/theme_mode_provider.dart`
   - `setThemeMode(ThemeMode)` to change theme
   - Persists to Drift database
 
@@ -107,10 +160,14 @@ lib/
   - Handles loading/error states → ThemeMode.system
   - Used by MaterialApp.router
 
+**Core App-Level Providers** (`lib/src/core/providers/`):
+
 - **appStartupProvider**: Coordinates app initialization
   - `@Riverpod(keepAlive: true)` - runs once at startup
   - Initializes theme and locale concurrently
   - Used in MaterialApp.router's `builder` for loading/error states
+
+- **appDatabaseProvider**: Provides singleton AppDatabase instance
 
 **State Management Patterns:**
 
@@ -265,13 +322,18 @@ fvm flutter pub run build_runner build --delete-conflicting-outputs  # Clean
 ```
 test/
 ├── widget_test.dart         # Main app widget test
-├── core/providers/          # Theme, locale providers
+├── core/providers/          # Core app-level provider tests
 └── features/
     ├── menu/presentation/
-    ├── theme_settings/presentation/widgets/
-    ├── locale_settings/
-    │   ├── data/            # Repository tests
-    │   └── presentation/widgets/
+    ├── settings/            # Settings feature tests (fractal)
+    │   ├── theme/
+    │   │   ├── providers/
+    │   │   ├── data/        # Repository tests
+    │   │   └── presentation/widgets/
+    │   └── locale/
+    │       ├── providers/
+    │       ├── data/        # Repository tests
+    │       └── presentation/widgets/
     └── game_modes/
         ├── shared/
         │   ├── logic/       # Win detection, validation
