@@ -88,6 +88,86 @@
   "@languageGerman": {
     "description": "German language option"
   },
+  "languageBulgarian": "Български",
+  "@languageBulgarian": {
+    "description": "Bulgarian language option"
+  },
+  "languageCroatian": "Hrvatski",
+  "@languageCroatian": {
+    "description": "Croatian language option"
+  },
+  "languageCzech": "Čeština",
+  "@languageCzech": {
+    "description": "Czech language option"
+  },
+  "languageDanish": "Dansk",
+  "@languageDanish": {
+    "description": "Danish language option"
+  },
+  "languageDutch": "Nederlands",
+  "@languageDutch": {
+    "description": "Dutch language option"
+  },
+  "languageEstonian": "Eesti",
+  "@languageEstonian": {
+    "description": "Estonian language option"
+  },
+  "languageFinnish": "Suomi",
+  "@languageFinnish": {
+    "description": "Finnish language option"
+  },
+  "languageGreek": "Ελληνικά",
+  "@languageGreek": {
+    "description": "Greek language option"
+  },
+  "languageHungarian": "Magyar",
+  "@languageHungarian": {
+    "description": "Hungarian language option"
+  },
+  "languageIrish": "Gaeilge",
+  "@languageIrish": {
+    "description": "Irish language option"
+  },
+  "languageItalian": "Italiano",
+  "@languageItalian": {
+    "description": "Italian language option"
+  },
+  "languageLatvian": "Latviešu",
+  "@languageLatvian": {
+    "description": "Latvian language option"
+  },
+  "languageLithuanian": "Lietuvių",
+  "@languageLithuanian": {
+    "description": "Lithuanian language option"
+  },
+  "languageMaltese": "Malti",
+  "@languageMaltese": {
+    "description": "Maltese language option"
+  },
+  "languagePolish": "Polski",
+  "@languagePolish": {
+    "description": "Polish language option"
+  },
+  "languagePortuguese": "Português",
+  "@languagePortuguese": {
+    "description": "Portuguese language option"
+  },
+  "languageRomanian": "Română",
+  "@languageRomanian": {
+    "description": "Romanian language option"
+  },
+  "languageSlovak": "Slovenčina",
+  "@languageSlovak": {
+    "description": "Slovak language option"
+  },
+  "languageSlovene": "Slovenščina",
+  "@languageSlovene": {
+    "description": "Slovene language option"
+  },
+  "languageSwedish": "Svenska",
+  "@languageSwedish": {
+    "description": "Swedish language option"
+  },
   "languageSystemDefault": "System Default",
   "@languageSystemDefault": {
     "description": "System default language option"

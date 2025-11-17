@@ -273,7 +273,13 @@ fvm flutter pub run build_runner build --delete-conflicting-outputs  # Clean
 
 ## Internationalization
 
-**Supported Languages:** English (en), French (fr), Spanish (es), German (de)
+**Supported Languages:** All 24 official EU languages
+
+- English (en), French (fr), Spanish (es), German (de)
+- Bulgarian (bg), Croatian (hr), Czech (cs), Danish (da), Dutch (nl)
+- Estonian (et), Finnish (fi), Greek (el), Hungarian (hu), Irish (ga)
+- Italian (it), Latvian (lv), Lithuanian (lt), Maltese (mt), Polish (pl)
+- Portuguese (pt), Romanian (ro), Slovak (sk), Slovene (sl), Swedish (sv)
 
 **Architecture:**
 1. **Models** (`lib/src/features/game_modes/shared/models/`): No display strings
@@ -293,7 +299,7 @@ fvm flutter pub run build_runner build --delete-conflicting-outputs  # Clean
 }
 ```
 
-2. Add translations to other ARB files (fr, es, de)
+2. Add translations to other ARB files (all 24 languages)
 3. Run `fvm flutter gen-l10n`
 4. Use in widgets: `Text(context.l10n.myString)`
 
