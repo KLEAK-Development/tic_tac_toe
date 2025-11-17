@@ -3,8 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:tic_tac_toe/src/core/extensions/build_context_extensions.dart';
 import 'package:tic_tac_toe/src/core/routing/app_router.dart';
 import 'package:tic_tac_toe/src/core/theme/app_spacing.dart' as spacing;
-import 'package:tic_tac_toe/src/features/locale_settings/locale_settings.dart';
-import 'package:tic_tac_toe/src/features/theme_settings/theme_settings.dart';
+import 'package:tic_tac_toe/src/features/settings/settings.dart';
 
 class MenuScreen extends ConsumerWidget {
   const MenuScreen({super.key});
