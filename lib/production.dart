@@ -13,7 +13,10 @@ void main() {
     ProviderScope(
       overrides: [
         serviceWorkerConfigProvider.overrideWithValue(
-          const ServiceWorkerConfig(scope: '/tic_tac_toe/'),
+          const ServiceWorkerConfig(
+            scriptUrl: './sw.js',
+            scope: '/tic_tac_toe/',
+          ),
         ),
       ],
       child: const App(),
