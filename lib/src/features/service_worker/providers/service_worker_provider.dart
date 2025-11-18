@@ -40,13 +40,13 @@ ServiceWorkerRegistrar serviceWorkerRegistrar(Ref ref) {
 /// Returns the registration scope on success, or null on failure/unsupported.
 @Riverpod(keepAlive: true)
 Future<String?> serviceWorkerRegistration(Ref ref) async {
-  final registrar = ref.watch(serviceWorkerRegistrarProvider);
+  final registrar = ref.read(serviceWorkerRegistrarProvider);
 
   if (!registrar.isSupported) {
     return null;
   }
 
-  final config = ref.watch(serviceWorkerConfigProvider);
+  final config = ref.read(serviceWorkerConfigProvider);
   return registrar.register(config);
 }
 
