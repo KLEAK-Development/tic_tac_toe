@@ -232,7 +232,9 @@ jobs:
         run: |
           flutter build web \
             --base-href /tic_tac_toe/ \
-            --target lib/production.dart
+            --target lib/production.dart \
+            --pwa-strategy none \
+            --no-web-resources-cdn
 
       - name: Upload web build for Pages
         uses: actions/upload-pages-artifact@v4

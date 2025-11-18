@@ -1,4 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:tic_tac_toe/src/features/service_worker/service_worker.dart';
 import 'package:tic_tac_toe/src/features/settings/settings.dart';
 
 part 'app_startup_provider.g.dart';
@@ -26,10 +27,11 @@ part 'app_startup_provider.g.dart';
 /// ```
 @Riverpod(keepAlive: true)
 Future<void> appStartup(Ref ref) async {
-  // Initialize theme mode and locale concurrently
+  // Initialize all features concurrently
   // Each feature controls its own initialization logic
   await Future.wait([
     initializeThemeSettings(ref),
     initializeLocaleSettings(ref),
+    initializeServiceWorker(ref),
   ]);
 }
