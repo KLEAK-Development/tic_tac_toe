@@ -14,7 +14,7 @@ void main() {
       overrides: [
         serviceWorkerConfigProvider.overrideWithValue(
           const ServiceWorkerConfig(
-            scriptUrl: './sw.js',
+            scriptUrl: '/tic_tac_toe/sw.js',
             scope: '/tic_tac_toe/',
           ),
         ),
