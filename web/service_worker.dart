@@ -243,12 +243,18 @@ Future<Response> _networkFirst(Request request) async {
 
     return response;
   } catch (_) {
-    // Network failed, try cache
-    final cache = await _self.caches.open(dynamicCacheName).toDart;
-    final cachedResponse = await cache.match(request).toDart;
+    // Network failed, try dynamic cache first
+    final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+    final dynamicResponse = await dynamicCache.match(request).toDart;
+    if (dynamicResponse != null) {
+      return dynamicResponse;
+    }
 
-    if (cachedResponse != null) {
-      return cachedResponse;
+    // Try static cache
+    final staticCache = await _self.caches.open(staticCacheName).toDart;
+    final staticResponse = await staticCache.match(request).toDart;
+    if (staticResponse != null) {
+      return staticResponse;
     }
 
     // Return offline page as last resort
@@ -271,14 +277,22 @@ Future<Response> _handleNavigationRequest(Request request) async {
     return response;
   } catch (_) {
     // Network failed, try cache
+    // Check static cache first (precached assets)
     final staticCache = await _self.caches.open(staticCacheName).toDart;
-
-    // Try to return cached index.html for SPA routing
     final cachedIndex = await staticCache
         .match(Request('index.html'.toJS))
         .toDart;
     if (cachedIndex != null) {
       return cachedIndex;
+    }
+
+    // Check dynamic cache (runtime cached assets)
+    final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+    final dynamicIndex = await dynamicCache
+        .match(Request('index.html'.toJS))
+        .toDart;
+    if (dynamicIndex != null) {
+      return dynamicIndex;
     }
 
     // Return offline page
@@ -288,11 +302,18 @@ Future<Response> _handleNavigationRequest(Request request) async {
 
 /// Get the offline fallback page
 Future<Response> _getOfflinePage() async {
-  final cache = await _self.caches.open(staticCacheName).toDart;
-  final offlinePage = await cache.match(Request('offline.html'.toJS)).toDart;
+  // Check static cache first
+  final staticCache = await _self.caches.open(staticCacheName).toDart;
+  final staticOffline = await staticCache.match(Request('offline.html'.toJS)).toDart;
+  if (staticOffline != null) {
+    return staticOffline;
+  }
 
-  if (offlinePage != null) {
-    return offlinePage;
+  // Check dynamic cache
+  final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+  final dynamicOffline = await dynamicCache.match(Request('offline.html'.toJS)).toDart;
+  if (dynamicOffline != null) {
+    return dynamicOffline;
   }
 
   // Create a basic offline response if offline.html isn't cached
