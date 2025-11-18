@@ -33,6 +33,7 @@ targets:
       build_web_compilers:entrypoint:
         generate_for:
           - web/worker.dart
+          - web/service_worker.dart
         options:
           compiler: dart2js
 
@@ -52,4 +53,6 @@ builders:
     import: "tool/builder.dart"
     builder_factories: ["CopyCompiledJs.new"]
     build_to: source
-    build_extensions: { "web/worker.dart.js": ["web/drift_worker.js"] }
+    build_extensions:
+      "web/worker.dart.js": ["web/drift_worker.js"]
+      "web/service_worker.dart.js": ["web/sw.js"]
