@@ -48,5 +48,7 @@
   "semanticCellFilled": "Komórka {cellNumber}, wypełniona symbolem {symbol}",
   "semanticGameStatus": "Status gry",
   "appInitializationError": "Nie udało się zainicjować aplikacji",
-  "retry": "Spróbuj ponownie"
+  "retry": "Spróbuj ponownie",
+  "appUpdateAvailable": "Dostępna jest nowa wersja",
+  "appUpdateRefresh": "Odśwież"
 }

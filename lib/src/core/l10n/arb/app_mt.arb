@@ -48,5 +48,7 @@
   "semanticCellFilled": "Ċella {cellNumber}, mimlija b'{symbol}",
   "semanticGameStatus": "Status tal-logħba",
   "appInitializationError": "Ma rnexxiex li jinbeda l-app",
-  "retry": "Erġa' pprova"
+  "retry": "Erġa' pprova",
+  "appUpdateAvailable": "Verżjoni ġdida disponibbli",
+  "appUpdateRefresh": "Aġġorna"
 }

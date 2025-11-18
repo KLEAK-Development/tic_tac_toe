@@ -48,5 +48,7 @@
   "semanticCellFilled": "Lahter {cellNumber}, täidetud sümboliga {symbol}",
   "semanticGameStatus": "Mängu staatus",
   "appInitializationError": "Rakenduse initsialiseerimine ebaõnnestus",
-  "retry": "Proovi uuesti"
+  "retry": "Proovi uuesti",
+  "appUpdateAvailable": "Saadaval on uus versioon",
+  "appUpdateRefresh": "Värskenda"
 }

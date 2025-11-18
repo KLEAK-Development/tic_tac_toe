@@ -48,5 +48,7 @@
   "semanticCellFilled": "Celulă {cellNumber}, umplută cu {symbol}",
   "semanticGameStatus": "Starea jocului",
   "appInitializationError": "Eșec la inițializarea aplicației",
-  "retry": "Reîncearcă"
+  "retry": "Reîncearcă",
+  "appUpdateAvailable": "O nouă versiune este disponibilă",
+  "appUpdateRefresh": "Reîmprospătare"
 }

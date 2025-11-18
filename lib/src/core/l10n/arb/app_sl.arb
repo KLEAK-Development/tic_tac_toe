@@ -48,5 +48,7 @@
   "semanticCellFilled": "Polje {cellNumber}, zapolnjeno s simbolom {symbol}",
   "semanticGameStatus": "Stanje igre",
   "appInitializationError": "Inicializacija aplikacije ni uspela",
-  "retry": "Poskusi znova"
+  "retry": "Poskusi znova",
+  "appUpdateAvailable": "Na voljo je nova različica",
+  "appUpdateRefresh": "Osveži"
 }

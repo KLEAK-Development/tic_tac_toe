@@ -48,5 +48,7 @@
   "semanticCellFilled": "Solu {cellNumber}, täytetty symbolilla {symbol}",
   "semanticGameStatus": "Pelin tila",
   "appInitializationError": "Sovelluksen alustus epäonnistui",
-  "retry": "Yritä uudelleen"
+  "retry": "Yritä uudelleen",
+  "appUpdateAvailable": "Uusi versio on saatavilla",
+  "appUpdateRefresh": "Päivitä"
 }

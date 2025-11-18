@@ -48,5 +48,7 @@
   "semanticCellFilled": "{cellNumber}. cella, kitöltve ezzel: {symbol}",
   "semanticGameStatus": "Játék állapota",
   "appInitializationError": "Az alkalmazás inicializálása sikertelen",
-  "retry": "Újra"
+  "retry": "Újra",
+  "appUpdateAvailable": "Új verzió elérhető",
+  "appUpdateRefresh": "Frissítés"
 }
