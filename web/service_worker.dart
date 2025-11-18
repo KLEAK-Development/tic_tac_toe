@@ -15,23 +15,32 @@ const String dynamicCacheName = 'tic-tac-toe-dynamic-$cacheVersion';
 const String syncQueueName = 'tic-tac-toe-sync-queue';
 
 /// Assets to precache during installation
+/// Uses relative paths - resolved relative to service worker location
 const List<String> precacheAssets = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/manifest.json',
-  '/favicon.png',
-  '/icons/Icon-192.png',
-  '/icons/Icon-512.png',
-  '/icons/Icon-maskable-192.png',
-  '/icons/Icon-maskable-512.png',
-  '/flutter_bootstrap.js',
+  './',
+  'index.html',
+  'offline.html',
+  'manifest.json',
+  'favicon.png',
+  'icons/Icon-192.png',
+  'icons/Icon-512.png',
+  'icons/Icon-maskable-192.png',
+  'icons/Icon-maskable-512.png',
+  'flutter_bootstrap.js',
   // Flutter generated assets
-  '/main.dart.js',
-  '/canvaskit/canvaskit.js',
-  '/canvaskit/canvaskit.wasm',
+  'main.dart.js',
+  'canvaskit/chromium/canvaskit.js',
+  'canvaskit/chromium/canvaskit.wasm',
+  // Flutter asset manifests
+  'assets/AssetManifest.bin',
+  'assets/AssetManifest.bin.json',
+  'assets/FontManifest.json',
+  // Material icons font
+  'assets/fonts/MaterialIcons-Regular.otf',
   // Drift database worker
-  '/drift_worker.js',
+  'drift_worker.js',
+  // sqlite3
+  'sqlite3.wasm',
 ];
 
 /// File extensions that should use stale-while-revalidate
@@ -168,8 +177,10 @@ Future<Response> _onFetch(FetchEvent event) async {
 /// Determine if URL should use stale-while-revalidate based on extension
 bool _shouldUseStaleWhileRevalidate(String url) {
   final lowerUrl = url.toLowerCase();
+  // Remove query string for extension matching
+  final urlWithoutQuery = lowerUrl.split('?').first;
   for (final ext in staleWhileRevalidateExtensions) {
-    if (lowerUrl.contains(ext)) {
+    if (urlWithoutQuery.endsWith(ext)) {
       return true;
     }
   }
@@ -206,13 +217,17 @@ Future<Response> _staleWhileRevalidate(Request request) async {
 
 /// Update cache in background without blocking the response
 void _updateCacheInBackground(Cache cache, Request request) {
-  _self.fetch(request).toDart.then((response) async {
-    if (response.ok) {
-      await cache.put(request, response.clone()).toDart;
-    }
-  }).catchError((_) {
-    // Silently ignore network errors during background update
-  });
+  _self
+      .fetch(request)
+      .toDart
+      .then((response) async {
+        if (response.ok) {
+          await cache.put(request, response.clone()).toDart;
+        }
+      })
+      .catchError((_) {
+        // Silently ignore network errors during background update
+      });
 }
 
 /// Network-first strategy with cache fallback
@@ -228,12 +243,18 @@ Future<Response> _networkFirst(Request request) async {
 
     return response;
   } catch (_) {
-    // Network failed, try cache
-    final cache = await _self.caches.open(dynamicCacheName).toDart;
-    final cachedResponse = await cache.match(request).toDart;
+    // Network failed, try dynamic cache first
+    final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+    final dynamicResponse = await dynamicCache.match(request).toDart;
+    if (dynamicResponse != null) {
+      return dynamicResponse;
+    }
 
-    if (cachedResponse != null) {
-      return cachedResponse;
+    // Try static cache
+    final staticCache = await _self.caches.open(staticCacheName).toDart;
+    final staticResponse = await staticCache.match(request).toDart;
+    if (staticResponse != null) {
+      return staticResponse;
     }
 
     // Return offline page as last resort
@@ -256,12 +277,22 @@ Future<Response> _handleNavigationRequest(Request request) async {
     return response;
   } catch (_) {
     // Network failed, try cache
+    // Check static cache first (precached assets)
     final staticCache = await _self.caches.open(staticCacheName).toDart;
-
-    // Try to return cached index.html for SPA routing
-    final cachedIndex = await staticCache.match(Request('/index.html'.toJS)).toDart;
+    final cachedIndex = await staticCache
+        .match(Request('index.html'.toJS))
+        .toDart;
     if (cachedIndex != null) {
       return cachedIndex;
+    }
+
+    // Check dynamic cache (runtime cached assets)
+    final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+    final dynamicIndex = await dynamicCache
+        .match(Request('index.html'.toJS))
+        .toDart;
+    if (dynamicIndex != null) {
+      return dynamicIndex;
     }
 
     // Return offline page
@@ -271,16 +302,24 @@ Future<Response> _handleNavigationRequest(Request request) async {
 
 /// Get the offline fallback page
 Future<Response> _getOfflinePage() async {
-  final cache = await _self.caches.open(staticCacheName).toDart;
-  final offlinePage = await cache.match(Request('/offline.html'.toJS)).toDart;
+  // Check static cache first
+  final staticCache = await _self.caches.open(staticCacheName).toDart;
+  final staticOffline = await staticCache.match(Request('offline.html'.toJS)).toDart;
+  if (staticOffline != null) {
+    return staticOffline;
+  }
 
-  if (offlinePage != null) {
-    return offlinePage;
+  // Check dynamic cache
+  final dynamicCache = await _self.caches.open(dynamicCacheName).toDart;
+  final dynamicOffline = await dynamicCache.match(Request('offline.html'.toJS)).toDart;
+  if (dynamicOffline != null) {
+    return dynamicOffline;
   }
 
   // Create a basic offline response if offline.html isn't cached
   return Response(
-    '<html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>'.toJS,
+    '<html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>'
+        .toJS,
     ResponseInit(
       status: 503,
       statusText: 'Service Unavailable',
