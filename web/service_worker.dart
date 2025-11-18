@@ -14,24 +14,35 @@ const String staticCacheName = 'tic-tac-toe-static-$cacheVersion';
 const String dynamicCacheName = 'tic-tac-toe-dynamic-$cacheVersion';
 const String syncQueueName = 'tic-tac-toe-sync-queue';
 
+/// Base path for GitHub Pages deployment
+const String basePath = '/tic_tac_toe';
+
 /// Assets to precache during installation
 const List<String> precacheAssets = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/manifest.json',
-  '/favicon.png',
-  '/icons/Icon-192.png',
-  '/icons/Icon-512.png',
-  '/icons/Icon-maskable-192.png',
-  '/icons/Icon-maskable-512.png',
-  '/flutter_bootstrap.js',
+  '$basePath/',
+  '$basePath/index.html',
+  '$basePath/offline.html',
+  '$basePath/manifest.json',
+  '$basePath/favicon.png',
+  '$basePath/icons/Icon-192.png',
+  '$basePath/icons/Icon-512.png',
+  '$basePath/icons/Icon-maskable-192.png',
+  '$basePath/icons/Icon-maskable-512.png',
+  '$basePath/flutter_bootstrap.js',
   // Flutter generated assets
-  '/main.dart.js',
-  '/canvaskit/canvaskit.js',
-  '/canvaskit/canvaskit.wasm',
+  '$basePath/main.dart.js',
+  '$basePath/canvaskit/chromium/canvaskit.js',
+  '$basePath/canvaskit/chromium/canvaskit.wasm',
+  // Flutter asset manifests
+  '$basePath/assets/AssetManifest.bin',
+  '$basePath/assets/AssetManifest.bin.json',
+  '$basePath/assets/FontManifest.json',
+  // Material icons font
+  '$basePath/assets/fonts/MaterialIcons-Regular.otf',
   // Drift database worker
-  '/drift_worker.js',
+  '$basePath/drift_worker.js',
+  // sqlite3
+  '$basePath/sqlite3.wasm',
 ];
 
 /// File extensions that should use stale-while-revalidate
@@ -168,8 +179,10 @@ Future<Response> _onFetch(FetchEvent event) async {
 /// Determine if URL should use stale-while-revalidate based on extension
 bool _shouldUseStaleWhileRevalidate(String url) {
   final lowerUrl = url.toLowerCase();
+  // Remove query string for extension matching
+  final urlWithoutQuery = lowerUrl.split('?').first;
   for (final ext in staleWhileRevalidateExtensions) {
-    if (lowerUrl.contains(ext)) {
+    if (urlWithoutQuery.endsWith(ext)) {
       return true;
     }
   }
@@ -206,13 +219,17 @@ Future<Response> _staleWhileRevalidate(Request request) async {
 
 /// Update cache in background without blocking the response
 void _updateCacheInBackground(Cache cache, Request request) {
-  _self.fetch(request).toDart.then((response) async {
-    if (response.ok) {
-      await cache.put(request, response.clone()).toDart;
-    }
-  }).catchError((_) {
-    // Silently ignore network errors during background update
-  });
+  _self
+      .fetch(request)
+      .toDart
+      .then((response) async {
+        if (response.ok) {
+          await cache.put(request, response.clone()).toDart;
+        }
+      })
+      .catchError((_) {
+        // Silently ignore network errors during background update
+      });
 }
 
 /// Network-first strategy with cache fallback
@@ -259,7 +276,9 @@ Future<Response> _handleNavigationRequest(Request request) async {
     final staticCache = await _self.caches.open(staticCacheName).toDart;
 
     // Try to return cached index.html for SPA routing
-    final cachedIndex = await staticCache.match(Request('/index.html'.toJS)).toDart;
+    final cachedIndex = await staticCache
+        .match(Request('$basePath/index.html'.toJS))
+        .toDart;
     if (cachedIndex != null) {
       return cachedIndex;
     }
@@ -272,7 +291,7 @@ Future<Response> _handleNavigationRequest(Request request) async {
 /// Get the offline fallback page
 Future<Response> _getOfflinePage() async {
   final cache = await _self.caches.open(staticCacheName).toDart;
-  final offlinePage = await cache.match(Request('/offline.html'.toJS)).toDart;
+  final offlinePage = await cache.match(Request('$basePath/offline.html'.toJS)).toDart;
 
   if (offlinePage != null) {
     return offlinePage;
@@ -280,7 +299,8 @@ Future<Response> _getOfflinePage() async {
 
   // Create a basic offline response if offline.html isn't cached
   return Response(
-    '<html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>'.toJS,
+    '<html><body><h1>Offline</h1><p>Please check your connection.</p></body></html>'
+        .toJS,
     ResponseInit(
       status: 503,
       statusText: 'Service Unavailable',
