@@ -14,35 +14,33 @@ const String staticCacheName = 'tic-tac-toe-static-$cacheVersion';
 const String dynamicCacheName = 'tic-tac-toe-dynamic-$cacheVersion';
 const String syncQueueName = 'tic-tac-toe-sync-queue';
 
-/// Base path for GitHub Pages deployment
-const String basePath = '/tic_tac_toe';
-
 /// Assets to precache during installation
+/// Uses relative paths - resolved relative to service worker location
 const List<String> precacheAssets = [
-  '$basePath/',
-  '$basePath/index.html',
-  '$basePath/offline.html',
-  '$basePath/manifest.json',
-  '$basePath/favicon.png',
-  '$basePath/icons/Icon-192.png',
-  '$basePath/icons/Icon-512.png',
-  '$basePath/icons/Icon-maskable-192.png',
-  '$basePath/icons/Icon-maskable-512.png',
-  '$basePath/flutter_bootstrap.js',
+  './',
+  'index.html',
+  'offline.html',
+  'manifest.json',
+  'favicon.png',
+  'icons/Icon-192.png',
+  'icons/Icon-512.png',
+  'icons/Icon-maskable-192.png',
+  'icons/Icon-maskable-512.png',
+  'flutter_bootstrap.js',
   // Flutter generated assets
-  '$basePath/main.dart.js',
-  '$basePath/canvaskit/chromium/canvaskit.js',
-  '$basePath/canvaskit/chromium/canvaskit.wasm',
+  'main.dart.js',
+  'canvaskit/chromium/canvaskit.js',
+  'canvaskit/chromium/canvaskit.wasm',
   // Flutter asset manifests
-  '$basePath/assets/AssetManifest.bin',
-  '$basePath/assets/AssetManifest.bin.json',
-  '$basePath/assets/FontManifest.json',
+  'assets/AssetManifest.bin',
+  'assets/AssetManifest.bin.json',
+  'assets/FontManifest.json',
   // Material icons font
-  '$basePath/assets/fonts/MaterialIcons-Regular.otf',
+  'assets/fonts/MaterialIcons-Regular.otf',
   // Drift database worker
-  '$basePath/drift_worker.js',
+  'drift_worker.js',
   // sqlite3
-  '$basePath/sqlite3.wasm',
+  'sqlite3.wasm',
 ];
 
 /// File extensions that should use stale-while-revalidate
@@ -277,7 +275,7 @@ Future<Response> _handleNavigationRequest(Request request) async {
 
     // Try to return cached index.html for SPA routing
     final cachedIndex = await staticCache
-        .match(Request('$basePath/index.html'.toJS))
+        .match(Request('index.html'.toJS))
         .toDart;
     if (cachedIndex != null) {
       return cachedIndex;
@@ -291,7 +289,7 @@ Future<Response> _handleNavigationRequest(Request request) async {
 /// Get the offline fallback page
 Future<Response> _getOfflinePage() async {
   final cache = await _self.caches.open(staticCacheName).toDart;
-  final offlinePage = await cache.match(Request('$basePath/offline.html'.toJS)).toDart;
+  final offlinePage = await cache.match(Request('offline.html'.toJS)).toDart;
 
   if (offlinePage != null) {
     return offlinePage;
