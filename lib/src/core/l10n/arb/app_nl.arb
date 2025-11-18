@@ -48,5 +48,7 @@
   "semanticCellFilled": "Cel {cellNumber}, gevuld met {symbol}",
   "semanticGameStatus": "Spelstatus",
   "appInitializationError": "Kan app niet initialiseren",
-  "retry": "Opnieuw proberen"
+  "retry": "Opnieuw proberen",
+  "appUpdateAvailable": "Er is een nieuwe versie beschikbaar",
+  "appUpdateRefresh": "Vernieuwen"
 }

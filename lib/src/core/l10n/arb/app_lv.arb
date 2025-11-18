@@ -48,5 +48,7 @@
   "semanticCellFilled": "Šūna {cellNumber}, aizpildīta ar {symbol}",
   "semanticGameStatus": "Spēles statuss",
   "appInitializationError": "Neizdevās inicializēt lietotni",
-  "retry": "Mēģināt vēlreiz"
+  "retry": "Mēģināt vēlreiz",
+  "appUpdateAvailable": "Pieejama jauna versija",
+  "appUpdateRefresh": "Atjaunināt"
 }

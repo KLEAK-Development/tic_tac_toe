@@ -48,5 +48,7 @@
   "semanticCellFilled": "Case {cellNumber}, remplie avec {symbol}",
   "semanticGameStatus": "État du jeu",
   "appInitializationError": "Échec de l'initialisation de l'application",
-  "retry": "Réessayer"
+  "retry": "Réessayer",
+  "appUpdateAvailable": "Une nouvelle version est disponible",
+  "appUpdateRefresh": "Actualiser"
 }

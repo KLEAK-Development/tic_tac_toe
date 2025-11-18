@@ -48,5 +48,7 @@
   "semanticCellFilled": "Κελί {cellNumber}, γεμισμένο με {symbol}",
   "semanticGameStatus": "Κατάσταση παιχνιδιού",
   "appInitializationError": "Αποτυχία αρχικοποίησης εφαρμογής",
-  "retry": "Δοκίμασε ξανά"
+  "retry": "Δοκίμασε ξανά",
+  "appUpdateAvailable": "Διατίθεται νέα έκδοση",
+  "appUpdateRefresh": "Ανανέωση"
 }

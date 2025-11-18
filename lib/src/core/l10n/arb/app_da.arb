@@ -48,5 +48,7 @@
   "semanticCellFilled": "Celle {cellNumber}, udfyldt med {symbol}",
   "semanticGameStatus": "Spilstatus",
   "appInitializationError": "Kunne ikke initialisere app",
-  "retry": "Prøv igen"
+  "retry": "Prøv igen",
+  "appUpdateAvailable": "En ny version er tilgængelig",
+  "appUpdateRefresh": "Opdater"
 }

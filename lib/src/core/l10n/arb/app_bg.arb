@@ -48,5 +48,7 @@
   "semanticCellFilled": "Клетка {cellNumber}, запълнена с {symbol}",
   "semanticGameStatus": "Състояние на играта",
   "appInitializationError": "Неуспешна инициализация на приложението",
-  "retry": "Опитай отново"
+  "retry": "Опитай отново",
+  "appUpdateAvailable": "Налична е нова версия",
+  "appUpdateRefresh": "Обнови"
 }

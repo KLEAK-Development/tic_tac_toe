@@ -48,5 +48,7 @@
   "semanticCellFilled": "Cill {cellNumber}, líonta le {symbol}",
   "semanticGameStatus": "Stádas an chluiche",
   "appInitializationError": "Theip ar thúsú an aip",
-  "retry": "Bain triail eile as"
+  "retry": "Bain triail eile as",
+  "appUpdateAvailable": "Tá leagan nua ar fáil",
+  "appUpdateRefresh": "Athnuaigh"
 }

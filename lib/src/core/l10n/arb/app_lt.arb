@@ -48,5 +48,7 @@
   "semanticCellFilled": "Langelis {cellNumber}, užpildytas {symbol}",
   "semanticGameStatus": "Žaidimo būsena",
   "appInitializationError": "Nepavyko inicializuoti programos",
-  "retry": "Bandyti dar kartą"
+  "retry": "Bandyti dar kartą",
+  "appUpdateAvailable": "Yra nauja versija",
+  "appUpdateRefresh": "Atnaujinti"
 }

@@ -48,5 +48,7 @@
   "semanticCellFilled": "Pole {cellNumber}, vyplnené symbolom {symbol}",
   "semanticGameStatus": "Stav hry",
   "appInitializationError": "Nepodarilo sa inicializovať aplikáciu",
-  "retry": "Skúsiť znova"
+  "retry": "Skúsiť znova",
+  "appUpdateAvailable": "K dispozícii je nová verzia",
+  "appUpdateRefresh": "Obnoviť"
 }

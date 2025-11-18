@@ -220,5 +220,13 @@
   "retry": "Retry",
   "@retry": {
     "description": "Button text to retry an operation"
+  },
+  "appUpdateAvailable": "A new version is available",
+  "@appUpdateAvailable": {
+    "description": "Message shown when a new app version is available for update"
+  },
+  "appUpdateRefresh": "Refresh",
+  "@appUpdateRefresh": {
+    "description": "Button text to refresh the app to apply the new version"
   }
 }
