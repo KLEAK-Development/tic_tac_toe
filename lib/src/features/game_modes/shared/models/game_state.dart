@@ -1,3 +1,4 @@
+import 'package:tic_tac_toe/src/features/game_modes/shared/logic/game_logic.dart';
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/game_status.dart';
 import 'package:tic_tac_toe/src/features/game_modes/shared/models/player.dart';
 
@@ -37,6 +38,43 @@ class GameState {
       board: board ?? List.from(this.board),
       currentPlayer: currentPlayer ?? this.currentPlayer,
       status: status ?? this.status,
+    );
+  }
+
+  /// Makes a move at the specified index and returns the new state
+  /// Returns the current state if the move is invalid or game is over
+  GameState makeMove(int index) {
+    // Only allow moves if game is still playing
+    if (status != GameStatus.playing) {
+      return this;
+    }
+
+    // Validate the move
+    if (!board.isValidMove(index)) {
+      return this;
+    }
+
+    // Create a new board with the move
+    final newBoard = List<Player?>.from(board);
+    newBoard[index] = currentPlayer;
+
+    // Check for winner
+    GameStatus newStatus = GameStatus.playing;
+    if (newBoard.hasWinner(currentPlayer)) {
+      newStatus = currentPlayer == Player.x
+          ? GameStatus.xWins
+          : GameStatus.oWins;
+    } else if (newBoard.isDraw) {
+      newStatus = GameStatus.draw;
+    }
+
+    // Return new state
+    return copyWith(
+      board: newBoard,
+      currentPlayer: newStatus == GameStatus.playing
+          ? currentPlayer.opposite
+          : currentPlayer,
+      status: newStatus,
     );
   }
 }
