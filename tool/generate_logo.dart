@@ -130,5 +130,4 @@ void main() {
   // Save the image
   final png = encodePng(image);
   File('assets/images/logo.png').writeAsBytesSync(png);
-  print('Logo generated at assets/images/logo.png');
 }
