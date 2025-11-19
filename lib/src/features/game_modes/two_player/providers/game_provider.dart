@@ -15,8 +15,6 @@ class TwoPlayerGame extends _$TwoPlayerGame
 
   /// Makes a move at the specified index
   @override
-  /// Makes a move at the specified index
-  @override
   void makeMove(int index) {
     state = state.makeMove(index);
   }

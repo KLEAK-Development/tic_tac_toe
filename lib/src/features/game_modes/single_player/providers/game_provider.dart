@@ -18,23 +18,19 @@ class SinglePlayerGame extends _$SinglePlayerGame
 
   /// Makes a move at the specified index (human player)
   /// After the human move, the computer automatically makes its move
-  @override
   /// Makes a move at the specified index (human player)
   /// After the human move, the computer automatically makes its move
   @override
   void makeMove(int index) {
-    // Only allow moves if game is still playing
-    if (state.status != GameStatus.playing) {
-      return;
-    }
-
-    // Validate the move
-    if (!state.board.isValidMove(index)) {
-      return;
-    }
-
     // Make human move
-    state = state.makeMove(index);
+    final newState = state.makeMove(index);
+
+    // If state didn't change, the move was invalid or game is over
+    if (newState == state) {
+      return;
+    }
+
+    state = newState;
 
     // If game is still playing, make computer move
     if (state.status == GameStatus.playing) {
